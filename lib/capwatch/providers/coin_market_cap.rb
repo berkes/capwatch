@@ -50,12 +50,7 @@ module Capwatch
         if provider_coin.nil?
           update_coin(coin, limit: limit, start: start += limit)
         else
-          coin.name               = provider_coin['name']
-          coin.price_fiat         = provider_coin[price_attribute].to_f
-          coin.price_btc          = provider_coin['price_btc'].to_f
-          coin.percent_change_1h  = provider_coin['percent_change_1h'].to_f
-          coin.percent_change_24h = provider_coin['percent_change_24h'].to_f
-          coin.percent_change_7d  = provider_coin['percent_change_7d'].to_f
+          coin.attributes = provider_coin
         end
         coin
       end
@@ -64,10 +59,6 @@ module Capwatch
 
       def ticker_url(limit: PAGE_LIMIT, start: 0)
         "#{TICKER_URL}?convert=#{config.currency}&limit=#{limit}&start=#{start}"
-      end
-
-      def price_attribute
-        "price_#{config.currency.downcase}"
       end
 
       def fail_no_coin(symbol)
