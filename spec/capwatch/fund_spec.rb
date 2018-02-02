@@ -3,14 +3,6 @@
 require "spec_helper"
 
 RSpec.describe Capwatch::Fund do
-
-  let(:unknown_coin) do
-    Capwatch::Coin.new do |coin|
-      coin.symbol = 'UNKNOWN_COIN'
-      coin.quantity = 5_000
-    end
-  end
-
   let(:config_name) { "Test Config" }
 
   let(:config_positions) do
@@ -28,8 +20,7 @@ RSpec.describe Capwatch::Fund do
   end
 
   let(:provider) do
-    p = Capwatch::Providers::CoinMarketCap.new(config: config)
-    p.body = [
+    tokens =  [
       {
           "id": "bitcoin",
           "name": "Bitcoin",
@@ -62,24 +53,15 @@ RSpec.describe Capwatch::Fund do
           "percent_change_7d": "13.06",
           "last_updated": "1502666050"
       }
-    ].to_json
-    p
+    ]
+
+    response = double("HTTP::Response", read: tokens.to_json)
+    provider = Capwatch::Providers::CoinMarketCap.new(config: config)
+    allow(provider).to receive(:open).and_return(response)
+    provider
   end
 
   subject { described_class.new(config: config, provider: provider) }
-
-  context "initialize" do
-
-    it "raise ex ecaption if coin cannot be matched with provider" do
-      subject.coins << unknown_coin
-      expect{ subject.build }
-        .to raise_exception(
-          Capwatch::Providers::CoinMarketCap::NoCoinInProvider,
-          "No UNKNOWN_COIN in provider response"
-        )
-    end
-
-  end
 
   context "#[]" do
 
