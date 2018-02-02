@@ -20,23 +20,23 @@ RSpec.describe Capwatch::Providers::CoinMarketCap do
 
   describe 'update_coin' do
     it 'paginates through the results until the request contains the coin' do
-      expect(subject).to receive(:open).
-        with(/&start=0/).ordered.
-        and_return(OpenStruct.new(read: [].to_json))
-      expect(subject).to receive(:open).
-        with(/&start=100$/).ordered.
-        and_return(OpenStruct.new(read: response))
+      expect(subject).to receive(:open)
+        .with(/&start=0/).ordered
+        .and_return(OpenStruct.new(read: [].to_json))
+      expect(subject).to receive(:open)
+        .with(/&start=100$/).ordered
+        .and_return(OpenStruct.new(read: response))
 
       expect(subject.update_coin(btc).name).to eq('Bitcoin')
     end
 
     it 'paginates through the results until the request gives a 404' do
-      expect(subject).to receive(:open).
-        with(/&start=0/).ordered.
-        and_return(OpenStruct.new(read: response))
-      expect(subject).to receive(:open).
-        with(/&start=100$/).ordered.
-        and_raise(not_found)
+      expect(subject).to receive(:open)
+        .with(/&start=0/).ordered
+        .and_return(OpenStruct.new(read: response))
+      expect(subject).to receive(:open)
+        .with(/&start=100$/).ordered
+        .and_raise(not_found)
 
       expect { subject.update_coin(unknown_coin) }.to raise_exception(
         Capwatch::Providers::CoinMarketCap::NoCoinInProvider,
