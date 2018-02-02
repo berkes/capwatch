@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-require "json"
-require "open-uri"
+require 'json'
+require 'open-uri'
 
 module Capwatch
   module Providers
@@ -11,7 +11,7 @@ module Capwatch
 
       NoCoinInProvider = Class.new(RuntimeError)
 
-      TICKER_URL = "https://api.coinmarketcap.com/v1/ticker/"
+      TICKER_URL = 'https://api.coinmarketcap.com/v1/ticker/'
       PAGE_LIMIT = 100
       FIRST_PAGE = 0
 
@@ -32,7 +32,7 @@ module Capwatch
         response.each do |coin_json|
           Capwatch::Exchange.rate(
             coin_json['symbol'],
-            coin_json["price_btc"].to_f
+            coin_json['price_btc'].to_f
           )
         end
       end
@@ -42,20 +42,20 @@ module Capwatch
           body = open(ticker_url(limit: limit, start: start)).read
           coins = update_rates(parse(body))
         rescue OpenURI::HTTPError => err
-          fail unless err.message == "404 NOT FOUND"
+          fail unless err.message == '404 NOT FOUND'
           fail_no_coin(coin.symbol)
         end
 
-        provider_coin = coins.find { |c| c["symbol"] == coin.symbol }
+        provider_coin = coins.find { |c| c['symbol'] == coin.symbol }
         if provider_coin.nil?
           update_coin(coin, limit: limit, start: start += limit)
         else
-          coin.name               = provider_coin["name"]
+          coin.name               = provider_coin['name']
           coin.price_fiat         = provider_coin[price_attribute].to_f
-          coin.price_btc          = provider_coin["price_btc"].to_f
-          coin.percent_change_1h  = provider_coin["percent_change_1h"].to_f
-          coin.percent_change_24h = provider_coin["percent_change_24h"].to_f
-          coin.percent_change_7d  = provider_coin["percent_change_7d"].to_f
+          coin.price_btc          = provider_coin['price_btc'].to_f
+          coin.percent_change_1h  = provider_coin['percent_change_1h'].to_f
+          coin.percent_change_24h = provider_coin['percent_change_24h'].to_f
+          coin.percent_change_7d  = provider_coin['percent_change_7d'].to_f
         end
         coin
       end
